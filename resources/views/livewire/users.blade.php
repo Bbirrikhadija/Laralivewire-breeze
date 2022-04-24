@@ -2,14 +2,16 @@
 <div>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tarifs') }}
+            {{ __('Users') }}
         </h2>
     </x-slot>
     {{-- The whole world belongs to you. --}}
-    @if ($UpdateMode == 2)
-        @include('livewire.users.create')
-    @elseif(!$UpdateMode)
-        @include('livewire.users.update')
+    @if (Auth::user()->role == 'editor' || Auth::user()->role == 'admin')
+        @if ($isOpen)
+            @include('livewire.users.update')
+        @else
+            @include('livewire.users.create')
+        @endif
     @endif
     <table class="table table-bordered mt-5">
         <thead>
@@ -30,11 +32,16 @@
                     <td>{{ $value->name }}</td>
                     <td>{{ $value->email }}</td>
                     <td>{{$value->role}}</td>
-
+                    @if (Auth::user()->role == 'editor' || Auth::user()->role == 'admin')
                     <td>
-                        <button wire:click="edit({{ $value->id }})" class="btn btn-primary">Edit</button>
-                        <button wire:click="delete({{ $value->id }})" class="btn btn-danger">Delete</button>
+                        <button wire:click="edit({{ $value->id }})"
+                            class="btn btn-primary btn-sm">Edit</button>
+                        @if (Auth::user()->role == 'admin')
+                            <button wire:click="delete({{ $value->id }})"
+                                class="btn btn-danger btn-sm">Delete</button>
+                        @endif
                     </td>
+                @endif
                 </tr>
             @endforeach
             </tbody>
